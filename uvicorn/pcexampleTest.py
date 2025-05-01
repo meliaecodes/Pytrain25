@@ -44,58 +44,43 @@ def handle_rx(_, data: bytearray):
 
 class LegoHubClient:
     def __init__(self):
-        pass
-    
+        self.client = None
+        #self.ready_event = asyncio.Event()
+        self.connected = False
+
     async def connect(self):
-      # Do a Bluetooth scan to find the hub.
-      device = await BleakScanner.find_device_by_name(HUB_NAME)
+        print("Scanning for LEGO hub...")
+        device = await BleakScanner.find_device_by_name(HUB_NAME)
+        if device is None:
+            raise RuntimeError(f"Could not find hub with name: {HUB_NAME}")
 
-      if device is None:
-          print(f"could not find hub with name: {HUB_NAME}")
-          return
+        self.client = BleakClient(device, disconnected_callback=handle_disconnect)
+        await self.client.connect()
+        print("Connected to hub.")
 
-      # Connect to the hub.
-      async with BleakClient(device, handle_disconnect) as client:
+        await self.client.start_notify(PYBRICKS_COMMAND_EVENT_CHAR_UUID, handle_rx, response=True)
+        self.connected = True
 
-          # Subscribe to notifications from the hub.
-          await client.start_notify(PYBRICKS_COMMAND_EVENT_CHAR_UUID, handle_rx)
+        # Tell user to start program on the hub.
+        print("Start the program on the hub now with the button.")
 
-          # Shorthand for sending some data to the hub.
-          async def send(data):
-              # Wait for hub to say that it is ready to receive data.
-              await ready_event.wait()
-              # Prepare for the next ready event.
-              ready_event.clear()
-              # Send the data to the hub.
-              await client.write_gatt_char(
-                  PYBRICKS_COMMAND_EVENT_CHAR_UUID,
-                  b"\x06" + data,  # prepend "write stdin" command (0x06)
-                  response=True
-              )
-
-          # Tell user to start program on the hub.
-          print("Start the program on the hub now with the button.")
-
-          # Send a few messages to the hub.
-          for i in range(5):
-              await send(b"fwd")
-              await asyncio.sleep(1)
-              await send(b"rev")
-              await asyncio.sleep(1)
-              print(".", end="", flush=True)
-
-          # Send a message to indicate stop.
-          await send(b"bye")
-
-          print("done.")
-
-      # Hub disconnects here when async with block exits.
+    async def disconnect(self):
+        print("Disconnecting...")
+        await self.send(b"bye")
+        self.client.disconnect()
+        self.connected = False
 
 
-# # Run the main async program.
-# if __name__ == "__main__":
-#     with suppress(asyncio.CancelledError):
-#         asyncio.run(main())
+    async def send(self, data: bytes):
+        if not self.connected or self.client is None:
+            raise RuntimeError("LEGO hub is not connected.")
+
+        await self.client.write_gatt_char(
+            PYBRICKS_COMMAND_EVENT_CHAR_UUID,
+            b"\x06" + data,  # 0x06 = "stdin write" command
+            response=True
+        )
+        print(f"Sent: {data}")
 
 trainClient = LegoHubClient()
 
@@ -103,7 +88,7 @@ trainClient = LegoHubClient()
 async def lifespan(app: FastAPI):
     await trainClient.connect()
     yield
-    #await trainClient.disconnect()
+    await trainClient.disconnect()
 
 app = FastAPI(lifespan=lifespan)
 
@@ -112,32 +97,26 @@ app = FastAPI(lifespan=lifespan)
 async def root():
     return {"message": "Hello World"}
 
-@app.get("/disconnect")
-async def root():
-    await trainClient.disconnect()
-    return {"message": "Disconnected"}
-
 @app.get("/accelerate")
 async def root():
+    print("accelerate")
     await trainClient.send(b"fwd")
-    await asyncio.sleep(8)
     return {"message": "Accelerate"}
 
 
 @app.get("/reverse")
 async def root():
     await trainClient.send(b"rev")
-    await asyncio.sleep(9)
     return {"message": "Go in reverse"}
 
 @app.get("/stop")
 async def root():
-    await trainClient.send(b"bye")
+    await trainClient.send(b"stp")
     return {"message": "Stop"}
 
 @app.get("/lap")
 async def root():
-    lights = await trainClient.send(b"l")
-    return {"message": "do a lap of the track"}
+    await trainClient.send(b"lap")
+    return {"message": "do a lap"}
 
 

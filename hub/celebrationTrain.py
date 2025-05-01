@@ -4,48 +4,54 @@ from pybricks.parameters import Button, Color, Direction, Port, Side, Stop
 from pybricks.robotics import DriveBase
 from pybricks.tools import wait, StopWatch
 
-# Declare standard MicroPython modules
+hub = CityHub()
+
+
+# Standard MicroPython modules
 from usys import stdin, stdout
 from uselect import poll
 
-# Initialise the lego components
-hub = CityHub()
-train = DCMotor(Port.A)
+motor = DCMotor(Port.A)
 sensor = ColorDistanceSensor(Port.B)
 
-# Register stdin for polling to allow you to wait for incoming data without blocking. 
+
+# Optional: Register stdin for polling. This allows
+# you to wait for incoming data without blocking.
 keyboard = poll()
 keyboard.register(stdin)
 
 def victory_lap(station_color):
     # give the train some time to leave the station
+    motor.dc(50)
     wait(300)
     while True:
         color = sensor.color()
         if color == station_color:
-            train.stop()
+            motor.stop()
             break
         wait(20)
 
 while True:
 
-    # Read a byte
-    cmd = stdin.buffer.read(1)
-    print(cmd)
+    # Let the remote program know we are ready for a command.
+    stdout.buffer.write(b"rdy")
 
-    # Decide what to do based on the command
-    if cmd == b"l":
-        train.dc(50)
+    # Optional: Check available input.
+    while not keyboard.poll(0):
+        # Optional: Do something here.
+        wait(10)
+
+    # Read three bytes.
+    cmd = stdin.buffer.read(3)
+
+    # Decide what to do based on the command.
+    if cmd == b"fwd":
+        motor.dc(50)
+    elif cmd == b"lap":
         victory_lap(Color.WHITE)
-    elif cmd == b"a":
-        # accelerate
-        train.dc(50)
-    elif cmd == b"r":
-        # reverse
-        train.dc(-50)
-    elif cmd == b"s":
-        train.stop()
-    elif cmd == b"b":
+    elif cmd == b"rev":
+        motor.dc(-50)
+    elif cmd == b"stp":
+        motor.stop()
+    elif cmd == b"bye":
         break
-    
-    stdout.buffer.write(b"OK")

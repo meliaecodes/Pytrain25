@@ -23,7 +23,7 @@ Head over to [Forge Quest](https://developer.atlassian.com/platform/tool/forge-q
 ## Quick start guide
 
 1. [Install pybricks on your Lego City hub](https://pybricks.com/install/) - make a note of your hubs name, we'll use that later! Don't worry, you can also use pybricks to put the original lego firmware back at any time!
-1. Use https://code.pybricks.com/ to store one of the python routines in the hub directory on your hubs flash memory See [pybricks docs](https://pybricks.com/install/technic-boost-city/#saving-a-program-on-the-hub)
+1. Use https://code.pybricks.com/ to store the `celebrationTrain.py` python routine in the `hub` directory on your Lego city hub flash memory See [pybricks docs](https://pybricks.com/install/technic-boost-city/#saving-a-program-on-the-hub)
 1. Change to the `uvicorn` directory and run ```uvicorn pytrainapi:app --reload``` and follow the directions to connect your lego city hub. 
 1. In a new terminal window run ```ngrok http 8000```
 1. Open the [Forge pytrain_trigger project README](/Forge/pytrain_trigger/README.md) and follow the quick start instructions to install the forge app to your developer environment. 

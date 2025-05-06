@@ -10,7 +10,11 @@ See [Set up Forge](https://developer.atlassian.com/platform/forge/set-up-forge/)
 
 ## Quick start
 
-- Modify your app by editing the `src/index.jsx` file.
+- Generate a new App ID and register the app to your atlassian developer account
+
+```
+forge register
+```
 
 - Build and deploy your app by running:
 ```

@@ -1,5 +1,9 @@
 # Lego City Train connected to Jira using Forge and Pybricks
 
+## Before you begin
+
+Head over to [Forge Quest](https://developer.atlassian.com/platform/tool/forge-quest/forge-novice/preparing/?utm_campaign=dx_external_conference&utm_source=qrcode&utm_content=forgetrain_devoxxuk) to get your forge dev environment set up. It'll only take a moment - and if you don't have a Lego train, why not check out one of the other fun tutorials. 
+
 ## You will need
 
 * A Lego City train. I used the Express Passenger Train 60337

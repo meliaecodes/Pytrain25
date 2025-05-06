@@ -119,5 +119,10 @@ async def root():
     await trainClient.send(b"lap")
     return {"message": "do a lap"}
 
+@app.get("/test")
+async def root():
+    await trainClient.send(b"tst")
+    return {"message": "test the lights"}
+
 
 

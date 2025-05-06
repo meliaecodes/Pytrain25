@@ -1,8 +1,6 @@
-Lego City Train connected to Jira / Confluence using Forge and Pybricks
+# Lego City Train connected to Jira using Forge and Pybricks
 
-To make your own forge train:
-
-You will need
+## You will need
 
 * A Lego City train. I used the Express Passenger Train 60337
 * Track included with the Lego City Express Passenger Train (of purchased separately)
@@ -16,16 +14,21 @@ You will need
 * uvicorn - https://www.uvicorn.org/
 * bleak - https://pypi.org/project/bleak/
 * fastapi - https://pypi.org/project/fastapi/
-* Forge environment
+* Forge developer environment
 
-What to do
+## Quick start guide
 
 1. [Install pybricks on your Lego City hub](https://pybricks.com/install/) - make a note of your hubs name, we'll use that later! Don't worry, you can also use pybricks to put the original lego firmware back at any time!
 1. Use https://code.pybricks.com/ to store one of the python routines in the hub directory on your hubs flash memory See [pybricks docs](https://pybricks.com/install/technic-boost-city/#saving-a-program-on-the-hub)
-???
-uvicorn pytrainapi:app --reload
-ngrok http 8000
+1. Change to the `uvicorn` directory and run ```uvicorn pytrainapi:app --reload``` and follow the directions to connect your lego city hub. 
+1. In a new terminal window run ```ngrok http 8000```
+1. Open the [Forge pytrain_trigger project README](/Forge/pytrain_trigger/README.md) and follow the quick start instructions to install the forge app to your developer environment. 
 
-Troubleshooting
+### Troubleshooting
 
 If you're using a color sensor, depending on the color of your surface you might experience difficulties with your train stopping at the right spot. My desk is wood laminate so white was the only colour that didn't get mistaken. 
+
+### Additional Resources
+
+I found this page extremely helpful in getting my API working
+https://pybricks.com/projects/tutorials/wireless/hub-to-device/pc-communication/
